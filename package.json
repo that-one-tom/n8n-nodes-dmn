@@ -1,6 +1,6 @@
 {
-  "name": "n8n-nodes-dmn",
-  "version": "0.1.13",
+  "name": "@that-one-tom/n8n-nodes-dmn",
+  "version": "0.1.14",
   "description": "n8n node for DMN (Decision Model and Notation) decision tables",
   "keywords": [
     "n8n-community-node-package",
