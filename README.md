@@ -2,6 +2,8 @@
 
 This is an n8n community node that provides DMN (Decision Model and Notation) decision table functionality following the DMN 1.3 specification.
 
+This node is inspired by [Dmsrdnv's n8n-nodes-dmn work](https://github.com/Dmsrdnv/n8n-nodes-dmn), but uses a slightly different design approach (one in- and output) and functions without external dependencies.
+
 ## Features
 
 - **DMN 1.3 Compliant**: Implements decision tables following the DMN 1.3 specification
