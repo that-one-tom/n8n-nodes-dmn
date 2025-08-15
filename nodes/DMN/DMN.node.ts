@@ -5,6 +5,7 @@ import {
 	INodeTypeDescription,
 	NodeOperationError,
 	NodeConnectionType,
+	ApplicationError,
 } from 'n8n-workflow';
 
 interface DecisionRule {
@@ -50,8 +51,8 @@ export class DMN implements INodeType {
 		defaults: {
 			name: 'DMN Decision Table',
 		},
-	inputs: ['main' as NodeConnectionType],
-	outputs: ['main' as NodeConnectionType],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 		properties: [
 			{
 				displayName: 'Operation',
@@ -85,21 +86,6 @@ export class DMN implements INodeType {
 				},
 				options: [
 					{
-						name: 'Unique',
-						value: 'UNIQUE',
-						description: 'No overlap is possible and rules are disjoint. Only one rule can match',
-					},
-					{
-						name: 'First',
-						value: 'FIRST',
-						description: 'Return the first matching rule in the order of the decision table',
-					},
-					{
-						name: 'Priority',
-						value: 'PRIORITY',
-						description: 'Return the matching rule with the highest priority',
-					},
-					{
 						name: 'Any',
 						value: 'ANY',
 						description: 'Multiple rules can match, but they all have the same output',
@@ -110,14 +96,29 @@ export class DMN implements INodeType {
 						description: 'Return all matching rules',
 					},
 					{
+						name: 'First',
+						value: 'FIRST',
+						description: 'Return the first matching rule in the order of the decision table',
+					},
+					{
+						name: 'Output Order',
+						value: 'OUTPUT_ORDER',
+						description: 'Return all matching rules sorted by their output values',
+					},
+					{
+						name: 'Priority',
+						value: 'PRIORITY',
+						description: 'Return the matching rule with the highest priority',
+					},
+					{
 						name: 'Rule Order',
 						value: 'RULE_ORDER',
 						description: 'Return all matching rules in the order they appear',
 					},
 					{
-						name: 'Output Order',
-						value: 'OUTPUT_ORDER',
-						description: 'Return all matching rules ordered by output values',
+						name: 'Unique',
+						value: 'UNIQUE',
+						description: 'No overlap is possible and rules are disjoint. Only one rule can match.',
 					},
 				],
 				default: 'UNIQUE',
@@ -135,6 +136,21 @@ export class DMN implements INodeType {
 				},
 				options: [
 					{
+						name: 'Count',
+						value: 'COUNT',
+						description: 'Count of matching rules',
+					},
+					{
+						name: 'Max',
+						value: 'MAX',
+						description: 'Maximum value',
+					},
+					{
+						name: 'Min',
+						value: 'MIN',
+						description: 'Minimum value',
+					},
+					{
 						name: 'None',
 						value: 'NONE',
 						description: 'Return all results',
@@ -143,21 +159,6 @@ export class DMN implements INodeType {
 						name: 'Sum',
 						value: 'SUM',
 						description: 'Sum of all outputs',
-					},
-					{
-						name: 'Count',
-						value: 'COUNT',
-						description: 'Count of matching rules',
-					},
-					{
-						name: 'Min',
-						value: 'MIN',
-						description: 'Minimum value',
-					},
-					{
-						name: 'Max',
-						value: 'MAX',
-						description: 'Maximum value',
 					},
 				],
 				default: 'NONE',
@@ -310,56 +311,42 @@ export class DMN implements INodeType {
 						displayName: 'Rule',
 						values: [
 							{
-								displayName: 'Rule ID',
-								name: 'id',
-								type: 'string',
-								default: '',
-								description: 'Unique identifier for the rule',
-								placeholder: 'rule_1',
+						displayName: 'Annotation',
+						name: 'annotation',
+						type: 'string',
+						default: '',
+						description: 'Optional description or comment for the rule',
 							},
 							{
-								displayName: 'Priority',
-								name: 'priority',
-								type: 'number',
-								default: 0,
-								description: 'Priority for PRIORITY hit policy (higher number = higher priority)',
-								displayOptions: {
-									show: {
-										'/hitPolicy': ['PRIORITY'],
-									},
-								},
+						displayName: 'Input Conditions',
+						name: 'conditions',
+						type: 'string',
+						default: '{}',
+						description: 'JSON object defining input conditions',
+						placeholder: '{\'age\': ">=	18\', \'country\': \'US\'}',
 							},
 							{
-								displayName: 'Input Conditions',
-								name: 'conditions',
-								type: 'string',
-								default: '{}',
-								description: 'JSON object defining input conditions',
-								placeholder: '{"age": ">= 18", "country": "US"}',
-								typeOptions: {
-									rows: 4,
-								},
+						displayName: 'Output Values',
+						name: 'outputs',
+						type: 'string',
+						default: '{}',
+						description: 'JSON object defining output values',
+						placeholder: '{\'discount\':	0.1, \'eligible\':	true}',
 							},
 							{
-								displayName: 'Output Values',
-								name: 'outputs',
-								type: 'string',
-								default: '{}',
-								description: 'JSON object defining output values',
-								placeholder: '{"discount": 0.1, "eligible": true}',
-								typeOptions: {
-									rows: 4,
-								},
+						displayName: 'Priority',
+						name: 'priority',
+						type: 'number',
+						default: 0,
+						description: 'Priority for PRIORITY hit policy (higher number	=	higher priority)',
 							},
 							{
-								displayName: 'Annotation',
-								name: 'annotation',
-								type: 'string',
-								default: '',
-								description: 'Optional description or comment for the rule',
-								typeOptions: {
-									rows: 2,
-								},
+						displayName: 'Rule ID',
+						name: 'id',
+						type: 'string',
+						default: '',
+						description: 'Unique identifier for the rule',
+						placeholder: 'rule_1',
 							},
 						],
 					},
@@ -481,7 +468,7 @@ function buildDecisionTable(this: IExecuteFunctions): DecisionTable {
 					? JSON.parse(ruleConfig.conditions)
 					: ruleConfig.conditions;
 			} catch (e) {
-				throw new Error(`Invalid JSON in rule ${index + 1} conditions: ${e instanceof Error ? e.message : String(e)}`);
+				throw new ApplicationError(`Invalid JSON in rule ${index + 1} conditions: ${e instanceof Error ? e.message : String(e)}`);
 			}
 
 			try {
@@ -489,7 +476,7 @@ function buildDecisionTable(this: IExecuteFunctions): DecisionTable {
 					? JSON.parse(ruleConfig.outputs)
 					: ruleConfig.outputs;
 			} catch (e) {
-				throw new Error(`Invalid JSON in rule ${index + 1} outputs: ${e instanceof Error ? e.message : String(e)}`);
+				throw new ApplicationError(`Invalid JSON in rule ${index + 1} outputs: ${e instanceof Error ? e.message : String(e)}`);
 			}
 
 			// Convert conditions to input array format
@@ -618,7 +605,7 @@ function evaluateDecisionTable(
 		switch (hitPolicy) {
 			case 'UNIQUE':
 				if (matchingRules.length > 1) {
-					throw new Error(`UNIQUE hit policy violated: ${matchingRules.length} rules matched`);
+					throw new ApplicationError(`UNIQUE hit policy violated: ${matchingRules.length} rules matched`);
 				}
 			result = matchingRules.length === 1 ? matchingRules[0].outputs : getDefaultOutputs.call(this, decisionTable.outputColumns);
 				break;
@@ -642,7 +629,7 @@ function evaluateDecisionTable(
 					const firstOutput = JSON.stringify(matchingRules[0].outputs);
 					const allSame = matchingRules.every(m => JSON.stringify(m.outputs) === firstOutput);
 					if (!allSame) {
-						throw new Error('ANY hit policy violated: matching rules have different outputs');
+						throw new ApplicationError('ANY hit policy violated: matching rules have different outputs');
 					}
 					result = matchingRules[0].outputs;
 			} else {
@@ -652,7 +639,7 @@ function evaluateDecisionTable(
 
 			case 'COLLECT':
 			case 'RULE_ORDER':
-			case 'OUTPUT_ORDER':
+			case 'OUTPUT_ORDER': {
 				if (hitPolicy === 'OUTPUT_ORDER') {
 					// Sort by output values
 					matchingRules.sort((a, b) => {
@@ -664,16 +651,17 @@ function evaluateDecisionTable(
 
 				const allOutputs = matchingRules.map(m => m.outputs);
 
-			// Apply aggregation if COLLECT
-			if (hitPolicy === 'COLLECT' && aggregation !== 'NONE') {
-				result = applyAggregation.call(this, allOutputs, aggregation, decisionTable.outputColumns);
+				// Apply aggregation if COLLECT
+				if (hitPolicy === 'COLLECT' && aggregation !== 'NONE') {
+					result = applyAggregation.call(this, allOutputs, aggregation, decisionTable.outputColumns);
 				} else {
 					result = { results: allOutputs };
 				}
 				break;
+			}
 
 			default:
-				throw new Error(`Unknown hit policy: ${hitPolicy}`);
+				throw new ApplicationError(`Unknown hit policy: ${hitPolicy}`);
 		}
 
 		// Add metadata if requested
@@ -700,7 +688,7 @@ function evaluateDecisionTable(
 
 		// Handle strict mode
 		if (options.strictMode && matchingRules.length === 0) {
-			throw new Error('No rules matched in strict mode');
+			throw new ApplicationError('No rules matched in strict mode');
 		}
 
 	return result;
@@ -832,7 +820,7 @@ function applyAggregation(this: IExecuteFunctions, outputs: any[], aggregation: 
 				
 			case 'SUM':
 			case 'MIN':
-			case 'MAX':
+			case 'MAX': {
 				const result: any = {};
 				
 				for (const column of outputColumns) {
@@ -856,8 +844,9 @@ function applyAggregation(this: IExecuteFunctions, outputs: any[], aggregation: 
 				}
 				
 				return result;
+			}
 				
-		default:
-			return { results: outputs };
-	}
+			default:
+				return { results: outputs };
+		}
 }

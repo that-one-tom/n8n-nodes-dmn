@@ -16,11 +16,11 @@ This is an n8n community node that provides DMN (Decision Model and Notation) de
 
 ## Installation
 
-### Community Node (Technically recommended, but not actually working as I have not pushed this beast to NPM yet)
+### Community Node (recommended)
 
 1. Open your n8n instance
 2. Go to **Settings** > **Community Nodes**
-3. Search for `n8n-nodes-dmn`
+3. Search for `@that-one-tom/n8n-nodes-dmn`
 4. Click **Install**
 
 ### Manual Installation
