@@ -11,9 +11,12 @@ This is an n8n community node that provides DMN (Decision Model and Notation) de
 - **Type Safety**: Automatic type conversion based on column definitions
 - **Debugging Support**: Optional metadata and execution trace for debugging
 
+## Screenshot
+![Input conditions for an example rule](/screenshots/input_conditions.png?raw=true" "Input conditions for an example rule")
+
 ## Installation
 
-### Community Node (Recommended)
+### Community Node (Technically recommended, but not actually working as I have not pushed this beast to NPM yet)
 
 1. Open your n8n instance
 2. Go to **Settings** > **Community Nodes**
