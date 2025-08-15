@@ -39,7 +39,7 @@ interface DecisionTable {
 	}>;
 }
 
-export class DMN implements INodeType {
+export class Dmn implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'DMN Decision Table',
 		name: 'dmn',
