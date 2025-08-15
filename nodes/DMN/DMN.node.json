@@ -1,0 +1,17 @@
+{
+	"node": "n8n-nodes-dmn.dmn",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Data Transformation", "Core Nodes"],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/yourusername/n8n-nodes-dmn"
+			}
+		]
+	},
+	"subcategories": {
+		"Data Transformation": ["Helpers"]
+	},
+	"alias": ["Decision Table", "Business Rules", "DMN", "Rules Engine"]
+}
